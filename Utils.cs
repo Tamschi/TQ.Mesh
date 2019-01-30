@@ -4,6 +4,7 @@ namespace TQ.Mesh
 {
     static class Utils
     {
-        public static Encoding Encoding => Encoding.GetEncoding(1252);
+        //TODO: Should be codepage 1252, but that's not supported by default.
+        public static Encoding Encoding => Encoding.ASCII;
     }
 }

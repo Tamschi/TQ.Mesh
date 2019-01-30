@@ -1,16 +1,20 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace TQ.Mesh
 {
     public readonly ref struct Mesh
     {
         public Span<byte> Data { get; }
-        public Mesh(Span<byte> data) => Data = data;
+        public Mesh(Span<byte> data)
+        {
+            Data = data;
+            for (int i = 0; i < Magic.Length; i++)
+            {
+                if (Data[i] != Magic[i]) throw new ArgumentException("Wrong magic.", nameof(data));
+            }
+        }
 
         [EditorBrowsable(EditorBrowsableState.Never)] public override bool Equals(object obj) => throw new NotSupportedException();
         [EditorBrowsable(EditorBrowsableState.Never)] public override int GetHashCode() => throw new NotSupportedException();
@@ -34,18 +38,19 @@ namespace TQ.Mesh
 
             static unsafe readonly int PartHeaderSize = sizeof(Part.Header);
 
-            public Part Current => new Part(_currentId, _data.Slice(_offset + PartHeaderSize, _currentLength));
+            public Part Current => new Part(_currentPartHeader.id, _data.Slice(_offset + PartHeaderSize, _currentPartHeader.length));
 
             private ref Part.Header _currentPartHeader => ref _data.View<Part.Header>(_offset);
-            private PartId _currentId => _currentPartHeader.id;
-            private int _currentLength => _currentPartHeader.length;
 
             public bool MoveNext()
             {
-                unsafe { _offset += sizeof(Part.Header) + _currentLength; }
-                if (_offset < _data.Length) return true;
-                else if (_offset == _data.Length) return false;
-                else /* _offset > _data.Length */ throw new InvalidOperationException("Tried to move beyond end of data.");
+                unsafe { _offset += sizeof(Part.Header) + _currentPartHeader.length; }
+                switch (_offset.CompareTo(_data.Length))
+                {
+                    case var x when x < 0: return true;
+                    case var x when x == 0: return false;
+                    default /* var x when x > 0: */: throw new InvalidOperationException("Tried to move beyond end of data.");
+                }
             }
 
             public void Reset() => _offset = 0;
@@ -53,10 +58,10 @@ namespace TQ.Mesh
 
         public readonly ref struct Part
         {
-            internal PartId Id { get; }
-            internal Span<byte> Data { get; }
+            public int Id { get; }
+            public Span<byte> Data { get; }
 
-            public Part(PartId id, Span<byte> data)
+            public Part(int id, Span<byte> data)
             {
                 Id = id;
                 Data = data;
@@ -65,14 +70,9 @@ namespace TQ.Mesh
             [StructLayout(LayoutKind.Sequential)]
             internal readonly struct Header
             {
-                public readonly PartId id;
+                public readonly int id;
                 public readonly int length;
             }
-        }
-
-        public enum PartId : int
-        {
-            MIF = 0
         }
     }
 }
