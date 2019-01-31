@@ -33,7 +33,7 @@ namespace TQ.Mesh
             public Enumerator(Span<byte> data)
             {
                 _data = data;
-                _offset = 0;
+                _offset = -1;
             }
 
             static unsafe readonly int PartHeaderSize = sizeof(Part.Header);
@@ -44,16 +44,17 @@ namespace TQ.Mesh
 
             public bool MoveNext()
             {
-                unsafe { _offset += sizeof(Part.Header) + _currentPartHeader.length; }
+                if (_offset == -1) _offset = 0;
+                else unsafe { _offset += sizeof(Part.Header) + _currentPartHeader.length; }
                 switch (_offset.CompareTo(_data.Length))
                 {
                     case var x when x < 0: return true;
                     case var x when x == 0: return false;
-                    default /* var x when x > 0: */: throw new InvalidOperationException("Tried to move beyond end of data.");
+                    default /* var x when x > 0 */: throw new InvalidOperationException("Tried to move beyond end of data.");
                 }
             }
 
-            public void Reset() => _offset = 0;
+            public void Reset() => _offset = -1;
         }
 
         public readonly ref struct Part
