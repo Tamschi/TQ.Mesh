@@ -55,7 +55,7 @@ namespace TQ.Mesh.Parts
                 {
                     case var x when x < 0: return true;
                     case var x when x == 0: return false;
-                    default /* var x when x > 0 */: throw new InvalidOperationException("Tried to move beyond end of data");
+                    default /* var x when x > 0 */: throw new InvalidOperationException("Tried to move beyond end of data.");
                 }
             }
 
