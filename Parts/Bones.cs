@@ -77,7 +77,7 @@ namespace TQ.Mesh.Parts
                 get
                 {
                     fixed (byte* namePtr = _bonesData[_index].Name)
-                    { return Utils.Encoding.GetString(namePtr, 32); }
+                    { return Utils.Encoding.GetString(namePtr, 32).TrimEnd('\0'); }
                 }
             }
 
