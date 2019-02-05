@@ -6,7 +6,7 @@ namespace TQ.Mesh
 {
     public readonly ref struct Mesh
     {
-        public Span<byte> Data { get; }
+        internal Span<byte> Data { get; }
         public Mesh(Span<byte> data)
         {
             Data = data;
@@ -21,24 +21,26 @@ namespace TQ.Mesh
         [EditorBrowsable(EditorBrowsableState.Never)] public override string ToString() => throw new NotImplementedException();
 
         private static readonly byte[] Magic = Utils.Encoding.GetBytes("MSH");
+        public ref byte Version => ref Data.View<byte>(Magic.Length);
 
-        public Enumerator GetEnumerator() => new Enumerator(Data.Slice(4)); //TODO: Do this more nicely.
+        public Enumerator GetEnumerator() => new Enumerator(Data.Slice(4), Version); //TODO: Do this more nicely.
 
         public ref struct Enumerator
         {
-
             private readonly Span<byte> _data;
+            private readonly byte _version;
             private int _offset;
 
-            public Enumerator(Span<byte> data)
+            public Enumerator(Span<byte> data, byte version)
             {
                 _data = data;
+                _version = version;
                 _offset = -1;
             }
 
             static unsafe readonly int PartHeaderSize = sizeof(Part.Header);
 
-            public Part Current => new Part(_currentPartHeader.id, _data.Slice(_offset + PartHeaderSize, _currentPartHeader.length));
+            public Part Current => new Part(_currentPartHeader.id, _data.Slice(_offset + PartHeaderSize, _currentPartHeader.length), _version);
 
             private ref Part.Header _currentPartHeader => ref _data.View<Part.Header>(_offset);
 
@@ -61,11 +63,13 @@ namespace TQ.Mesh
         {
             public int Id { get; }
             public Span<byte> Data { get; }
+            public byte Version { get; }
 
-            public Part(int id, Span<byte> data)
+            public Part(int id, Span<byte> data, byte version)
             {
                 Id = id;
                 Data = data;
+                Version = version;
             }
 
             [StructLayout(LayoutKind.Sequential)]

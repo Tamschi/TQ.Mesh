@@ -6,15 +6,15 @@ namespace TQ.Mesh.Parts
 {
     public static partial class PartDestructuringExtensions
     {
-        public static bool Is(this Part @this, out VertexBuffer mif)
+        public static bool Is(this Part @this, out VertexBuffer vertexBuffer)
         {
             switch (@this.Id)
             {
                 case 4:
-                    mif = new VertexBuffer(@this.Data);
+                    vertexBuffer = new VertexBuffer(@this.Data);
                     return true;
                 default:
-                    mif = default;
+                    vertexBuffer = default;
                     return false;
             }
         }
@@ -22,8 +22,8 @@ namespace TQ.Mesh.Parts
 
     public readonly ref struct VertexBuffer
     {
-        public Span<byte> Data { get; }
-        public VertexBuffer(Span<byte> data) => Data = data;
+        readonly Span<byte> _data;
+        public VertexBuffer(Span<byte> data) => _data = data;
 
         readonly struct Header
         {
@@ -63,13 +63,13 @@ namespace TQ.Mesh.Parts
             }
         }
 
-        public Span<ChunkId> Chunks => MemoryMarshal.Cast<int, ChunkId>(Data.ViewRange<int>(CHUNK_IDS_OFFSET, Data.View<Header>(0).ChunkCount));
+        public Span<ChunkId> Chunks => MemoryMarshal.Cast<int, ChunkId>(_data.ViewRange<int>(CHUNK_IDS_OFFSET, _data.View<Header>(0).ChunkCount));
         public Span<byte> Buffer
         {
             get
             {
-                ref var header = ref Data.View<Header>(0);
-                return Data.Slice(CHUNK_IDS_OFFSET + sizeof(ChunkId) * header.ChunkCount, header.Stride * header.VertexCount);
+                ref var header = ref _data.View<Header>(0);
+                return _data.Slice(CHUNK_IDS_OFFSET + sizeof(ChunkId) * header.ChunkCount, header.Stride * header.VertexCount);
             }
         }
     }
