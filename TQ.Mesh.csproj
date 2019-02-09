@@ -13,4 +13,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SpanUtils\SpanUtils.csproj" />
+    <ProjectReference Include="..\TQ.Common\TQ.Common.csproj" />
+  </ItemGroup>
+
 </Project>

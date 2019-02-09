@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SpanUtils;
+using System;
+using TQ.Common;
 using static TQ.Mesh.Mesh;
 
 namespace TQ.Mesh.Parts
@@ -65,7 +67,7 @@ namespace TQ.Mesh.Parts
         readonly Span<byte> _data;
         public Shader(Span<byte> data) => _data = data;
 
-        public string FileName => Utils.Encoding.GetString(_data.Slice(sizeof(int), _data.View<int>(0)));
+        public string FileName => Definitions.Encoding.GetString(_data.Slice(sizeof(int), _data.View<int>(0)));
         public Enumerator GetEnumerator() => new Enumerator(
             data: _data.Slice(sizeof(int) + _data.View<int>(0) + sizeof(int)),
             count: _data.View<int>(sizeof(int) + _data.View<int>(0)));
@@ -124,7 +126,7 @@ namespace TQ.Mesh.Parts
             );
 
         int _NameLength => _data.View<int>(0);
-        public string Name => Utils.Encoding.GetString(_data.Slice(sizeof(int), _data.View<int>(0)));
+        public string Name => Definitions.Encoding.GetString(_data.Slice(sizeof(int), _data.View<int>(0)));
 
         enum Type : int
         {
@@ -141,7 +143,7 @@ namespace TQ.Mesh.Parts
         {
             if (_Type == Type.String)
             {
-                value = Utils.Encoding.GetString(_data.Slice(_ValueOffset + sizeof(int), _data.View<int>(_ValueOffset)));
+                value = Definitions.Encoding.GetString(_data.Slice(_ValueOffset + sizeof(int), _data.View<int>(_ValueOffset)));
                 return true;
             }
             else

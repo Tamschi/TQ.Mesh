@@ -1,6 +1,8 @@
-﻿using System;
+﻿using SpanUtils;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using TQ.Common;
 
 namespace TQ.Mesh
 {
@@ -20,7 +22,7 @@ namespace TQ.Mesh
         [EditorBrowsable(EditorBrowsableState.Never)] public override int GetHashCode() => throw new NotSupportedException();
         [EditorBrowsable(EditorBrowsableState.Never)] public override string ToString() => throw new NotImplementedException();
 
-        private static readonly byte[] Magic = Utils.Encoding.GetBytes("MSH");
+        private static readonly byte[] Magic = Definitions.Encoding.GetBytes("MSH");
         public ref byte Version => ref Data.View<byte>(Magic.Length);
 
         public Enumerator GetEnumerator() => new Enumerator(Data.Slice(4), Version); //TODO: Do this more nicely.

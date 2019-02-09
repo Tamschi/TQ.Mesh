@@ -1,5 +1,7 @@
-﻿using System;
+﻿using SpanUtils;
+using System;
 using System.Runtime.InteropServices;
+using TQ.Common;
 using static TQ.Mesh.Mesh;
 
 namespace TQ.Mesh.Parts
@@ -77,7 +79,7 @@ namespace TQ.Mesh.Parts
                 get
                 {
                     fixed (byte* namePtr = _bonesData[_index].Name)
-                    { return Utils.Encoding.GetString(namePtr, 32).TrimEnd('\0'); }
+                    { return Definitions.Encoding.GetString(namePtr, 32).TrimEnd('\0'); }
                 }
             }
 

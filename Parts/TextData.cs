@@ -1,4 +1,5 @@
 ﻿using System;
+using TQ.Common;
 using static TQ.Mesh.Mesh;
 
 namespace TQ.Mesh.Parts
@@ -25,6 +26,6 @@ namespace TQ.Mesh.Parts
 
         public TextData(Span<byte> data) => Data = data;
 
-        public string Text => Utils.Encoding.GetString(Data);
+        public string Text => Definitions.Encoding.GetString(Data);
     }
 }

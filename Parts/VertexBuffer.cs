@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SpanUtils;
+using System;
 using System.Runtime.InteropServices;
 using static TQ.Mesh.Mesh;
 

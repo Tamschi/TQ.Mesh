@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SpanUtils;
+using System;
+using TQ.Common;
 using static TQ.Mesh.Mesh;
 
 namespace TQ.Mesh.Parts
@@ -26,7 +28,7 @@ namespace TQ.Mesh.Parts
         public MIF(Span<byte> data) => _data = data;
 
         public string Text
-            => Utils.Encoding.GetString(_data.Slice(
+            => Definitions.Encoding.GetString(_data.Slice(
                 start: sizeof(int),
                 length: _data.View<int>(0)
             ));
