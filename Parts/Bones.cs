@@ -67,31 +67,31 @@ namespace TQ.Mesh.Parts
         public ref struct Bone
         {
             readonly Span<BoneData> _bonesData;
-            readonly int _index;
+            public int Index { get; }
             internal Bone(Span<BoneData> bonesData, int index)
             {
                 _bonesData = bonesData;
-                _index = index;
+                Index = index;
             }
 
             public unsafe string Name
             {
                 get
                 {
-                    fixed (byte* namePtr = _bonesData[_index].Name)
+                    fixed (byte* namePtr = _bonesData[Index].Name)
                     { return Definitions.Encoding.GetString(namePtr, 32).TrimEnd('\0'); }
                 }
             }
 
-            int _firstChild => _bonesData[_index].FirstChild;
-            public int ChildCount => _bonesData[_index].ChildCount;
+            int _firstChild => _bonesData[Index].FirstChild;
+            public int ChildCount => _bonesData[Index].ChildCount;
             public Enumerator GetEnumerator() => new Enumerator(_bonesData, skip: _firstChild, take: ChildCount);
 
             public unsafe Span<float> Axes
             {
                 get
                 {
-                    fixed (float* axesPtr = _bonesData[_index].Axes)
+                    fixed (float* axesPtr = _bonesData[Index].Axes)
                     { return MemoryMarshal.CreateSpan(ref *axesPtr, 9); }
                 }
             }
@@ -100,7 +100,7 @@ namespace TQ.Mesh.Parts
             {
                 get
                 {
-                    fixed (float* positionPtr = _bonesData[_index].Position)
+                    fixed (float* positionPtr = _bonesData[Index].Position)
                     { return MemoryMarshal.CreateSpan(ref *positionPtr, 3); }
                 }
             }
