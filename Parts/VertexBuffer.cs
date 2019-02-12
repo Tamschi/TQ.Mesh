@@ -48,7 +48,7 @@ namespace TQ.Mesh.Parts
             Bytes = 14 //UNKNOWN
         }
 
-        public static int GetAttributeSize(AttributeId chunkId)
+        public static uint GetAttributeSize(AttributeId chunkId)
         {
             switch (chunkId)
             {
