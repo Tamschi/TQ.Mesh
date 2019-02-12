@@ -1,5 +1,6 @@
 ﻿using SpanUtils;
 using System;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using TQ.Common;
 using static TQ.Mesh.Mesh;
@@ -96,14 +97,7 @@ namespace TQ.Mesh.Parts
                 }
             }
 
-            public unsafe Span<float> Position
-            {
-                get
-                {
-                    fixed (float* positionPtr = _bonesData[Index].Position)
-                    { return MemoryMarshal.CreateSpan(ref *positionPtr, 3); }
-                }
-            }
+            public ref Vector3 Position => ref _bonesData[Index].Position;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -113,7 +107,7 @@ namespace TQ.Mesh.Parts
             public readonly int FirstChild;
             public readonly int ChildCount;
             public fixed float Axes[9];
-            public fixed float Position[3];
+            public Vector3 Position;
         }
     }
 }

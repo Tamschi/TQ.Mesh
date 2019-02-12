@@ -1,5 +1,6 @@
 ﻿using SpanUtils;
 using System;
+using System.Numerics;
 using TQ.Common;
 using static TQ.Mesh.Mesh;
 
@@ -119,11 +120,20 @@ namespace TQ.Mesh.Parts
         readonly Span<byte> _data;
         public Parameter(Span<byte> data) => _data = data;
 
-        public int BinarySize => _ValueOffset + (
-            _Type == Type.String ? sizeof(int) + _data.View<int>(_ValueOffset)
-                : ValueIs(out Span<float> value) ? value.Length * sizeof(float)
-                : throw new NotImplementedException("Unknown shader parameter type: " + _Type)
-            );
+        public int BinarySize
+        {
+            get
+            {
+                switch (_Type)
+                {
+                    case Type.String: return _ValueOffset + sizeof(int) + _data.View<int>(_ValueOffset);
+                    case Type.TwoFloats: return _ValueOffset + 2 * sizeof(float);
+                    case Type.ThreeFloats: return _ValueOffset + 3 * sizeof(float);
+                    case Type.FloatId: return _ValueOffset + sizeof(float);
+                    default: throw new NotImplementedException("Unknown shader parameter type: " + _Type);
+                }
+            }
+        }
 
         int _NameLength => _data.View<int>(0);
         public string Name => Definitions.Encoding.GetString(_data.Slice(sizeof(int), _data.View<int>(0)));
@@ -146,29 +156,34 @@ namespace TQ.Mesh.Parts
                 value = Definitions.Encoding.GetString(_data.Slice(_ValueOffset + sizeof(int), _data.View<int>(_ValueOffset)));
                 return true;
             }
-            else
-            {
-                value = null;
-                return false;
-            }
+            else { value = default; return false; }
         }
-        public bool ValueIs(out Span<float> value)
+        public bool ValueIs(out float value)
         {
-            switch (_Type)
+            if (_Type == Type.FloatId)
             {
-                case Type.TwoFloats:
-                    value = _data.ViewRange<float>(_ValueOffset, 2);
-                    return true;
-                case Type.ThreeFloats:
-                    value = _data.ViewRange<float>(_ValueOffset, 3);
-                    return true;
-                case Type.FloatId:
-                    value = _data.ViewRange<float>(_ValueOffset, 1);
-                    return true;
-                default:
-                    value = default;
-                    return false;
+                value = _data.View<float>(_ValueOffset);
+                return true;
             }
+            else { value = default; return false; }
+        }
+        public bool ValueIs(out Vector2 value)
+        {
+            if (_Type == Type.TwoFloats)
+            {
+                value = _data.View<Vector2>(_ValueOffset);
+                return true;
+            }
+            else { value = default; return false; }
+        }
+        public bool ValueIs(out Vector3 value)
+        {
+            if (_Type == Type.ThreeFloats)
+            {
+                value = _data.View<Vector3>(_ValueOffset);
+                return true;
+            }
+            else { value = default; return false; }
         }
     }
 }

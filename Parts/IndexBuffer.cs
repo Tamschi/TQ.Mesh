@@ -1,5 +1,6 @@
 ﻿using SpanUtils;
 using System;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using static TQ.Mesh.Mesh;
 
@@ -110,11 +111,7 @@ namespace TQ.Mesh.Parts
     public struct DrawCall11
     {
         public int SubShader;
-        public int MinX;
-        public int MinY;
-        public int MinZ;
-        public int MaxX;
-        public int MaxY;
-        public int MaxZ;
+        public Vector3 Min;
+        public Vector3 Max;
     }
 }
